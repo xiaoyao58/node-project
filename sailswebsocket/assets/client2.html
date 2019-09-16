@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Document</title>
+  <script type="text/javascript" src="./js/dependencies/sails.io.js"></script>
+  <script type="text/javascript">
+    io.sails.url = 'http://localhost:1337';
+    </script>    
+</head>
+<body>
+    <textarea id="ta" rows="20" cols="30"></textarea>
+    <form id="formId" action="http://localhost:1337/socket/socketTest" method="POST" target="_iframe">
+      Message:<br>
+      <input type="text" name="message">
+      <input type="submit" value="提交">
+  </form>
+  <iframe id="id_iframe" name="_iframe" height="0" width="0" ></iframe>
+  <script type="text/javascript">
+
+    // `io` is available as a global.
+    // `io.socket` will connect automatically, but at this point in the DOM, it is not ready yet
+    // (think of $(document).ready() from jQuery)
+    //
+    // Fortunately, this library provides an abstraction to avoid this issue.
+    // Requests you make before `io` is ready will be queued and replayed automatically when the socket connects.
+    // To disable this behavior or configure other things, you can set properties on `io.sails`.
+    // You have one cycle of the event loop to set `io.sails.autoConnect` to false before the auto-connection
+    // behavior starts.
+  console.log('hello')
+    io.socket.get('/socket/socketTest', function serverResponded (body, JWR) {
+  
+      // JWR ==> "JSON WebSocket Response"
+      console.log('Sails responded with: ', body);
+      console.log('with headers: ', JWR.headers);
+      console.log('and with status code: ', JWR.statusCode);
+  
+      // first argument `body` === `JWR.body`
+      // (just for convenience, and to maintain familiar usage, a la `JQuery.get()`)
+    });
+    io.socket.put('/socket/socketTest',{cp:'psychic'},function(resData,jwr){
+      resData.statusCode;
+    })
+    io.socket.on('message',(data)=>{
+      if(data.message !== undefined){
+        document.getElementById("ta").innerHTML += data.message+'\n';
+      }
+      
+    });
+    $.ajax({
+				cache: true,
+				type: "POST",
+				url:"Servlet",
+				data:$('#formId').serialize(),// 你的formid
+				async: false,
+				error: function(request) {
+					alert("Connection error:"+request.error);
+				},
+				success: function(data) {
+					alert("SUCCESS!");
+				}
+			});
+  </script>
+</body>
+</html>
+<!-- Import SDK (if using the linker, then this will be injected automatically) -->
+<!-- <script type="text/javascript" src="/dependencies/sails.io.js"></script> -->
+
+<!-- Example usage
+<script type="text/javascript">
+
+  // `io` is available as a global.
+  // `io.socket` will connect automatically, but at this point in the DOM, it is not ready yet
+  // (think of $(document).ready() from jQuery)
+  //
+  // Fortunately, this library provides an abstraction to avoid this issue.
+  // Requests you make before `io` is ready will be queued and replayed automatically when the socket connects.
+  // To disable this behavior or configure other things, you can set properties on `io.sails`.
+  // You have one cycle of the event loop to set `io.sails.autoConnect` to false before the auto-connection
+  // behavior starts.
+
+  io.socket.get('/leave/socketTest', function serverResponded (body, JWR) {
+
+    // JWR ==> "JSON WebSocket Response"
+    console.log('Sails responded with: ', body);
+    console.log('with headers: ', JWR.headers);
+    console.log('and with status code: ', JWR.statusCode);
+
+    // first argument `body` === `JWR.body`
+    // (just for convenience, and to maintain familiar usage, a la `JQuery.get()`)
+  });
+</script> -->
+</html>
