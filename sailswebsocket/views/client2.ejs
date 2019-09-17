@@ -1568,7 +1568,7 @@
 </head>
 
 <body>
-  <textarea id="ta" rows="20" cols="30"></textarea>
+  <textarea id="ta" rows="20" cols="60"></textarea>
   <form id="formId" action="http://10.2.100.191:1337/socket/socketTest" method="POST" target="_iframe">
     Message:<br>
     <input id="msg" type="text" name="message">
@@ -1597,27 +1597,33 @@
     // first argument `body` === `JWR.body`
     // (just for convenience, and to maintain familiar usage, a la `JQuery.get()`)
     // });
-    // var user_id = '01be804e-44e7-41ef-9286-e674d79f9960';
-    // io.socket.post('/socket/socketTest');
 
+    io.socket.post('/socket/socketTest');
+    // var user_id = '8B53C81FC11D';
     document.getElementById('sbm').onclick = function () {
-      io.socket.post('/socket/socketTest', { 
+      io.socket.post('/socket/socketTest', {
         message: document.getElementById('msg').value,
-        user_id: "5d1817b0-8df6-4745-a600-bc3ced41b9c1",
+        user_id: '5d1817b0-8df6-4745-a600-bc3ced41b9c1',
         conv_id: 'conv_88ddb315-6b9c-4cff-b485-83cfec35c162'
       });
       io.socket.on('message', (data) => {
-        if (data.message !== undefined && data.message !== '') {
-          document.getElementById('msg').value = "";
+        for (var i = 0; i < data.list.length; i++) {
+          if (data.list[i].msg !== undefined && data.list[i].msg !== '') {
+            document.getElementById('msg').value = "";
+          }
         }
+
       });
     }
 
 
     io.socket.on('message', (data) => {
-      if (data.message !== undefined) {
-        document.getElementById("ta").innerHTML += data.message + '\n';
-      }
+      document.getElementById("ta").innerHTML='';
+      for (var i = 0; i < data.list.length; i++) {
+          if (data.list[i].msg !== undefined) {
+            document.getElementById("ta").innerHTML += 'user:'+data.list[i].from_user +'\n'+'create_at:'+data.list[i].create_at+'\n'+'message:'+data.list[i].msg+ '\n\n';
+          }
+        }
 
     });
 
