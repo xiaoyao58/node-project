@@ -1598,9 +1598,14 @@
     // (just for convenience, and to maintain familiar usage, a la `JQuery.get()`)
     // });
     
-    io.socket.post('/socket/socketTest');
+    // io.socket.post('/socket/socketTest');
+    // var user_id = '8B53C81FC11D';
     document.getElementById('sbm').onclick = function () {
-      io.socket.post('/socket/socketTest', { message: document.getElementById('msg').value });
+      io.socket.post('/socket/socketTest', {
+         message: document.getElementById('msg').value,
+         user_id : '82474dc2-248c-4b03-8f39-7c590f0a87a0',
+         conv_id: 'conv_88ddb315-6b9c-4cff-b485-83cfec35c162'
+         });
       io.socket.on('message', (data) => {
         if (data.message !== undefined && data.message !== '') {
           document.getElementById('msg').value = "";
