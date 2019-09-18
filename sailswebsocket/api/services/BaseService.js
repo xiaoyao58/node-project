@@ -29,10 +29,11 @@ var mysql = require('mysql');
  });
  //测试
 var pool = mysql.createPool({
- 	host: '10.2.100.59',
+ 	host: '10.2.100.143',
  	user: 'root',
  	password: '123456',
- 	database: 'sails',
+	database: 'sails',
+	//  timezone:"08:00",
  	multipleStatements: true
 });
 var connection = mysql.createConnection({

@@ -16,7 +16,7 @@ module.exports = {
 		var create_user = req.param('user_id');
 		var conv_id = 'conv_' + uuid.v4();
 		var conv_name = req.param('conv_name');
-		var create_at = moment().format('YYYY-MM-DD HH:mm:ss');
+		var create_at = '';
 		var create_at = new Date();
 		BaseService.exec_sql('insert into conv(conv_id,conv_name,create_user,create_at) values(?,?,?,?)', [conv_id, conv_name, create_user, create_at]);
 		res.json({
@@ -33,6 +33,7 @@ module.exports = {
 		var message = req.param('message');
 		var socketId = sails.sockets.getId(req);
 		var conv_id = req.param('conv_id');
+		var create_at = moment().format('YYYY-MM-DD HH:mm:ss');
 
 		if (!req.isSocket) {
 			return res.badRequest();
@@ -54,7 +55,25 @@ module.exports = {
 							}
 						});
 						sails.sockets.addRoomMembersToRooms(user_id, ['room']);
-						SaveMessageService.exec_insert(conv_id, data.user_id, message);
+						SaveMessageService.exec_insert(conv_id, data.user_id, message,()=>{
+							BaseService.exec_sql('select * from conv_msg where conv_id =? order by create_at asc', [conv_id], (err, data) =>{
+								if (data && !_.isEmpty(data)) {
+									_.forEach(data, (data) => {
+										var msg = {};
+										msg.msg = data.msg;
+										create_at = moment(data.create_at).format('YYYY-MM-DD HH:mm:ss');
+										msg.create_at = create_at;
+										console.log(create_at);
+										msg.conv_id = data.conv_id;
+										msg.from_user = data.from_user;
+										send.list.push(msg);
+										
+									});
+									// console.log(send);
+									sails.sockets.broadcast('room', send);
+								}
+							});
+						});
 					}
 
 				});
@@ -62,21 +81,7 @@ module.exports = {
 					sails.sockets.broadcast(user_id, { message: '系统消息:' + new Date() });
 				}, 1000 * 60 * 30);
 			}
-			BaseService.exec_sql('select * from conv_msg where conv_id =? order by create_at asc', [conv_id], (err, data) =>{
-                if (data && !_.isEmpty(data)) {
-					_.forEach(data, (data) => {
-						var msg = {};
-						msg.msg = data.msg;
-						msg.create_at = DateFormat.dateFormat(data.create_at);
-						msg.conv_id = data.conv_id;
-						msg.from_user = data.from_user;
-						send.list.push(msg);
-						
-					});
-					console.log(send);
-					sails.sockets.broadcast('room', send);
-				}
-            });
+			
 			
 
 			return res.json(socketId);

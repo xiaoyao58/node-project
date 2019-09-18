@@ -1,7 +1,7 @@
 var moment = require('moment');
 var uuid = require('node-uuid');
 module.exports ={
-    exec_insert : function(conv_id,user_id,msg){
+    exec_insert : function(conv_id,user_id,msg,callback){
         var create_user = user_id;
         
         var conv_id = conv_id;
@@ -12,25 +12,43 @@ module.exports ={
         BaseService.exec_sql('select user_name from users where user_id = ?;select conv_id from conv',[user_id],(err,data)=>{
             if(err){
                 sails.log(err);
-                return 0;
+                
+                if (callback) {  
+                    return callback(err);  
+                }  
             }
             var list_conv = [];
             _.forEach(data[1],(data)=>{
                 list_conv.push(data.conv_id);
             });
             if(data&&list_conv.indexOf(conv_id)!==-1){
+                var done = _.after(data[0].length,()=>{
+                    if (callback) {  
+                        return callback();  
+                    }  
+                })
                 _.forEach(data[0],(data)=>{
                     BaseService.exec_sql('insert into conv_member(conv_id,user_id,user_name) values(?,?,?);insert into conv_msg(msg_id,msg,create_at,conv_id,from_user) values(?,?,?,?,?)',[conv_id,create_user,data.user_name,msg_id,message,create_at,conv_id,data.user_name],(err,data)=>{
                         if(err){
                             sails.log(err);
+                            if (callback) {  
+                                return callback(err);  
+                            }  
                         }
+                        done();
                     });
-                })
+                });
+                
             }
-            
-        })
-        console.log('end..................');
+            if (callback) {  
+               return callback();  
+            }  
+            // return cb(null,data);
+        });
         
-        
+        if (callback) {  
+            return callback();  
+         } 
+         console.log('end..................');
     }
 };
