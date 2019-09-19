@@ -1574,6 +1574,16 @@
     <input id="msg" type="text" name="message">
     <input id="sbm" type="submit" value="提交">
   </form>
+
+  <!-- <input type="file" name="image" id="uploadFile" style="display:none;">
+  <input type="hidden" name="img">
+  <button type="button" class="beatiful" id="uploadBtn">上传图片</button>  
+  <div><img src="" class="img-show"></div> -->
+  <form id="upload-form" action="http://10.2.100.191:1337/socket/upload" method="post" enctype="multipart/form-data" >
+    　　　<input type="file" id="upload" name="file" /> <br />
+    　　　<input type="submit" value="Upload" />
+    </form>
+<img src='assets\images\4a06f622-028a-4323-97ef-a58326006f88.jpeg'/>
   <iframe id="id_iframe" name="_iframe" height="0" width="0"></iframe>
   <script type="text/javascript">
 
@@ -1599,7 +1609,6 @@
     // });
 
     io.socket.post('/socket/socketTest');
-    // var user_id = '8B53C81FC11D';
     document.getElementById('sbm').onclick = function () {
       io.socket.post('/socket/socketTest', {
         message: document.getElementById('msg').value,
@@ -1612,7 +1621,6 @@
             document.getElementById('msg').value = "";
           }
         }
-
       });
     }
 
@@ -1623,6 +1631,9 @@
           if (data.list[i].msg !== undefined) {
             document.getElementById("ta").innerHTML += 'user:'+data.list[i].from_user +'\n'+'create_at:'+data.list[i].create_at+'\n'+'message:'+data.list[i].msg+ '\n\n';
           }
+        }
+        if(data.message){
+          document.getElementById('ta').innerHTML += data.message+'\n\n';
         }
 
     });
@@ -1642,6 +1653,37 @@
       }
     });
   </script>
+
+  <!-- <script>
+    //因为html自带的图片上传贼丑，所以这里用按钮来代替。
+    $('#uploadBtn').click(function() {
+        $('#uploadFile').click();
+        //当图片选中后，会触发name=file文本的change事件
+        $('#uploadFile').change(function() {
+            var formData = new FormData()
+            formData.append('file', this.files[0])
+            if(formData) {
+                $.ajax({
+                    url: 'http://localhost:1337/socket/upload',
+                    type: 'POST',
+                    data: formData,
+                    async: true,
+                    cache: false,
+                    contentType: false,
+                    processData: false,
+                    success: function(res) {
+                        if(res.status == 0) {
+                            alert(res.msg)
+                            return false    
+                        }
+                        $('input[name="img"]').val(res.msg)
+                        $('.img-show').attr('src', res.msg)
+                    }
+                })
+            }
+        })
+    });
+  </script> -->
 </body>
 
 </html>

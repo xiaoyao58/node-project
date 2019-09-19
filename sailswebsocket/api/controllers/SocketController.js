@@ -41,7 +41,7 @@ module.exports = {
 		console.log('socketId:' + socketId);
 		console.log('message:' + message);
 
-		BaseService.exec_sql('select * from users',(err, data) => {
+		BaseService.exec_sql('select * from users', (err, data) => {
 			if (err) {
 				sails.log(err);
 				return 0;
@@ -55,19 +55,18 @@ module.exports = {
 							}
 						});
 						sails.sockets.addRoomMembersToRooms(user_id, ['room']);
-						SaveMessageService.exec_insert(conv_id, data.user_id, message,()=>{
-							BaseService.exec_sql('select * from conv_msg where conv_id =? order by create_at asc', [conv_id], (err, data) =>{
+						SaveMessageService.exec_insert(conv_id, data.user_id, message, () => {
+							BaseService.exec_sql('select * from conv_msg where conv_id =? order by create_at asc', [conv_id], (err, data) => {
 								if (data && !_.isEmpty(data)) {
 									_.forEach(data, (data) => {
 										var msg = {};
 										msg.msg = data.msg;
 										create_at = moment(data.create_at).format('YYYY-MM-DD HH:mm:ss');
 										msg.create_at = create_at;
-										console.log(create_at);
 										msg.conv_id = data.conv_id;
 										msg.from_user = data.from_user;
 										send.list.push(msg);
-										
+
 									});
 									// console.log(send);
 									sails.sockets.broadcast('room', send);
@@ -78,17 +77,39 @@ module.exports = {
 
 				});
 				setInterval(() => {
-					sails.sockets.broadcast(user_id, { message: '系统消息:' + new Date() });
-				}, 1000 * 60 * 30);
+					sails.sockets.broadcast(user_id, { message: '系统消息:' + moment(new Date()).format('YYYY-MM-DD HH:mm:ss') });
+				}, 1000 * 60 * 1);
 			}
-			
-			
+
+
 
 			return res.json(socketId);
 		});
 
 
 
+	},
+
+	upload: function(req,res){
+		var fileName = uuid.v4();
+		const maxBytes = 1024*1024*100;
+		const file_path = '../../api/view/image';
+		var file = req.file('file');
+		var name = file._files[0].stream.filename;
+		var ext = name.substring(name.lastIndexOf('.'));
+		file.upload({
+			maxBytes: maxBytes,
+			dirname: file_path+'/',
+			saveAs: fileName+ext
+		},function(err,uploadFile){
+			if(err){
+				sails.log(err);
+				return 0;
+			}
+			if(uploadFile){
+				console.log(uploadFile);
+			}
+		});
 	},
 	client1: function (req, res) {
 		res.view('client1');
