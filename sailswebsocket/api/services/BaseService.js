@@ -29,7 +29,7 @@ var mysql = require('mysql');
  });
  //测试
 var pool = mysql.createPool({
- 	host: '10.2.100.143',
+ 	host: '10.2.100.97',
  	user: 'root',
  	password: '123456',
 	database: 'sails',

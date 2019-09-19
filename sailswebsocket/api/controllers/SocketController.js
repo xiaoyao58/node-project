@@ -33,7 +33,6 @@ module.exports = {
 		var message = req.param('message');
 		var socketId = sails.sockets.getId(req);
 		var conv_id = req.param('conv_id');
-		var create_at = moment().format('YYYY-MM-DD HH:mm:ss');
 
 		if (!req.isSocket) {
 			return res.badRequest();
@@ -61,12 +60,10 @@ module.exports = {
 									_.forEach(data, (data) => {
 										var msg = {};
 										msg.msg = data.msg;
-										create_at = moment(data.create_at).format('YYYY-MM-DD HH:mm:ss');
-										msg.create_at = create_at;
+										msg.create_at = moment(data.create_at).format('YYYY-MM-DD HH:mm:ss');
 										msg.conv_id = data.conv_id;
 										msg.from_user = data.from_user;
 										send.list.push(msg);
-
 									});
 									// console.log(send);
 									sails.sockets.broadcast('room', send);
@@ -76,9 +73,9 @@ module.exports = {
 					}
 
 				});
-				setInterval(() => {
-					sails.sockets.broadcast(user_id, { message: '系统消息:' + moment(new Date()).format('YYYY-MM-DD HH:mm:ss') });
-				}, 1000 * 60 * 1);
+				// setInterval(() => {
+				// 	sails.sockets.broadcast(user_id, { message: '系统消息:' + moment(new Date()).format('YYYY-MM-DD HH:mm:ss') });
+				// }, 1000 * 60 * 1);
 			}
 
 
@@ -93,7 +90,7 @@ module.exports = {
 	upload: function(req,res){
 		var fileName = uuid.v4();
 		const maxBytes = 1024*1024*100;
-		const file_path = '../../api/view/image';
+		const file_path = '../../assets/images';
 		var file = req.file('file');
 		var name = file._files[0].stream.filename;
 		var ext = name.substring(name.lastIndexOf('.'));
