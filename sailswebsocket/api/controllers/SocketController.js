@@ -65,7 +65,6 @@ module.exports = {
 										msg.from_user = data.from_user;
 										send.list.push(msg);
 									});
-									// console.log(send);
 									sails.sockets.broadcast('room', send);
 								}
 							});
@@ -86,8 +85,12 @@ module.exports = {
 
 
 	},
+	getfile: function(req,res){
+		
+	},
 
 	upload: function(req,res){
+		var user_id = req.param('user_id');
 		var fileName = uuid.v4();
 		const maxBytes = 1024*1024*100;
 		const file_path = '../../assets/images';
@@ -107,6 +110,15 @@ module.exports = {
 				console.log(uploadFile);
 			}
 		});
+		BaseService.exec_sql('select user_name from users where user_id = ?',[user_id],(err,data)=>{
+			if(err){
+				return req.badRequest();
+			}
+			if(data&&!_.isEmpty(data)){
+				BaseService.exec_sql('insert into conv_file(file_id,conv_id,create_user,file_name,file_path,type,create_at) values(?,?,?,?,?,?,?)',[fileName,])
+			}
+		});
+
 	},
 	client1: function (req, res) {
 		res.view('client1');

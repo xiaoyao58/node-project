@@ -28,13 +28,22 @@ var mysql = require('mysql');
 	 multipleStatements: true
  });
  //测试
+// var pool = mysql.createPool({
+//  	host: '10.2.100.138',
+//  	user: 'root',
+//  	password: '123456',
+// 	database: 'sails',
+// 	//  timezone:"08:00",
+//  	multipleStatements: true
+// });
+
 var pool = mysql.createPool({
- 	host: '10.2.100.97',
- 	user: 'root',
- 	password: '123456',
-	database: 'sails',
-	//  timezone:"08:00",
- 	multipleStatements: true
+	host:'10.2.100.125',
+	user:'root',
+	password:'123456',
+	database:'wapp',
+	multipleStatements:true
+	
 });
 var connection = mysql.createConnection({
 	host: '10.1.92.232',

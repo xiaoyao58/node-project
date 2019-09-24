@@ -28,7 +28,7 @@ module.exports ={
                     }  
                 })
                 _.forEach(data[0],(data)=>{
-                    BaseService.exec_sql('insert into conv_member(conv_id,user_id,user_name) values(?,?,?);insert into conv_msg(msg_id,msg,create_at,conv_id,from_user) values(?,?,?,?,?)',[conv_id,create_user,data.user_name,msg_id,message,create_at,conv_id,data.user_name],(err,data)=>{
+                    BaseService.exec_sql('call sp_save_message(?,?,?,?,?,?)',[conv_id,create_user,data.user_name,msg_id,message,create_at],(err,data)=>{
                         if(err){
                             sails.log(err);
                             if (callback) {  
