@@ -38,7 +38,7 @@ var mysql = require('mysql');
 // });
 
 var pool = mysql.createPool({
-	host:'10.2.100.153',
+	host:'10.2.100.125',
 	user:'root',
 	password:'123456',
 	database:'wapp',

@@ -180,7 +180,6 @@ module.exports = {
                 result.leave = '未查询到请假信息'
             }
             if (!_.isEmpty(data[2])) {
-                console.log(data[2]);
                 _.forEach(data[2], (data) => {
                     var allow_leave_time = {
                         start_time: data.start_time,
@@ -331,7 +330,7 @@ module.exports = {
                                 user_fh.device.status = 1;
                                 user_fh.device.name = "设备异常";
                             }
-                        }else{
+                        } else {
                             user_fh.device.status = 1;
                             user_fh.device.name = "设备异常";
                         }
@@ -357,7 +356,7 @@ module.exports = {
                     if (data.start_addr_name == null) {
                         user_fh.kq_result.addr_ex = '位置异常'
                     }
-                    if(user_fh.device.status==1){
+                    if (user_fh.device.status == 1) {
                         user_fh.kq_result.device_ex = '设备异常'
                     }
                     if (data.overtime_mins > 0) {
@@ -554,7 +553,7 @@ module.exports = {
                                 user_yl.device.status = 1;
                                 user_yl.device.name = "设备异常";
                             }
-                        }else{
+                        } else {
                             user_yl.device.status = 1;
                             user_yl.device.name = "设备异常";
                         }
@@ -579,7 +578,7 @@ module.exports = {
                     if (data0.start_addr_name == null) {
                         user_yl.kq_result.addr_ex = '位置异常';
                     }
-                    if(user_yl.device.status==1){
+                    if (user_yl.device.status == 1) {
                         user_yl.kq_result.device_ex = '设备异常';
                     }
                     if (data0.overtime_mins > 0) {
@@ -588,14 +587,14 @@ module.exports = {
 
                     result.list.push(user_yl);
                 });
-                
+
                 if (!_.isEmpty(user_id)) {
                     var user_list = _.filter(result.list, (o) => {
                         return user_id.indexOf(o.user.user_id) !== -1;
                     })
                     result.list = user_list;
                 }
-                
+
                 if (status && !_.isEmpty(status)) {
                     var status_list = _.filter(result.list, function (o) {
                         return status.indexOf(o.status) !== -1;
@@ -670,15 +669,14 @@ module.exports = {
         var end_date = get_end ? get_end : moment(moment().subtract(1, 'day')).format('YYYY-MM-DD');
         var user_id = req.param('user_id');
         var device_cs = 0;
-
         var result = {};
         result.list = [];
-        BaseService.exec_sql('call sp_kq_statistic(?,?,?);select * from kq_device',[dept_id,start_date,end_date],(err,data)=>{
-            if(err){
+        BaseService.exec_sql('call sp_kq_statistic(?,?,?);select * from kq_device', [dept_id, start_date, end_date], (err, data) => {
+            if (err) {
                 return res.json(err);
             }
-            if(data&&!_.isEmpty(data[0])){
-                _.forEach(data[0],function (data0){
+            if (data && !_.isEmpty(data[0])) {
+                _.forEach(data[0], function (data0) {
                     var kq_statis = {};
                     kq_statis.user = {};
                     kq_statis.user.user_id = data0.user_id;
@@ -694,7 +692,7 @@ module.exports = {
                     kq_statis.overtime_cs = data0.overtime_cs;
                     kq_statis.overtime_time = data0.overtime_time;
                     kq_statis.late_early_cs = data0.late_early_cs;
-                    kq_statis.late_early_time =data0.late_early_time;
+                    kq_statis.late_early_time = data0.late_early_time;
                     kq_statis.kg = data0.kg;
                     kq_statis.leave = {
                         all_count: data0.all_count,
@@ -710,14 +708,14 @@ module.exports = {
                         jsj_count: data0.jsj_count,
                         qtj_count: data0.qtj_count
                     };
-                    var device_list = _.filter(data[1],(f)=>{
-                        return f.kq_id = data0.kq_id;
+                    var device_list = _.filter(data[1], (f) => {
+                        return ((f.kq_id === data0.kq_id) && (data0.review_at === null));
                     });
-                    if(!_.isEmpty(device_list)){
+                    if (!_.isEmpty(device_list)) {
 
-                        for(var date=satrt_date;date<=end_date;moment(date).add('day')){
-                            var device_day = _.filter(device_list,(dl)=>{
-                               return dl.create_at == date;
+                        for (var date = satrt_date; date <= end_date; moment(date).add('day')) {
+                            var device_day = _.filter(device_list, (dl) => {
+                                return dl.create_at == date;
                             });
                             var device_find1 = _.find(device_day, (f) => {
                                 return f.kq_type == 1;
@@ -730,13 +728,104 @@ module.exports = {
                             }
                         }
                     }
-                   kq_statis.device_cs = device_cs;
+
+                    kq_statis.device_cs = device_cs;
                     result.list.push(kq_statis);
                 });
-               
+                if (user_id) {
+                    if (!_.isEmpty(user_id)) {
+                        result.list = _.filter(result.list, (o) => {
+                            return user_id.indexOf(o.user.user_id) !== -1;
+                        });
+                    }
+                }
+                res.json(result);
+            } else {
+                res.json('未查询到相关数据');
+            }
+        });
+    },
+    kq_statis_detail: function (req, res) {
+        var user_id = req.param('user_id');
+        var get_start = req.param('start_date');
+        var get_end = req.param('end_date');
+        var start_date = get_start ? get_start : moment(moment().format('YYYY-MM') + '-' + '21').format('YYYY-MM-DD');
+        var end_date = get_end ? get_end : moment(moment().subtract(1, 'day')).format('YYYY-MM-DD');
+        var result = {};
+        result.list = [];
+        BaseService.exec_sql('call sp_kq(?,?,?)', [user_id, start_date, end_date], (err, data) => {
+
+            if (err) {
+                return res.json(err);
+            }
+            if (data && !_.isEmpty(data[1])) {
+                _.forEach(data[1], (data1) => {
+                    var kq_detail = {};
+                    kq_detail.user = {
+                        user_id: data1.user_id,
+                        user_name: data1.name,
+                        avatar: data1.avatar
+                    };
+
+
+                    kq_detail.statis = {
+                        late_cs: data1.late_cs,
+                        early_cs: data1.early_cs,
+                        kg_cs: data1.kg_cs,
+                        Nout_cs: data1.Nout_cs,
+                        addr_ex_cs: data1.addr_ex_cs,
+                        late_min: data1.late_min,
+                        early_min: data1.early_min,
+                        overtime_cs: data1.overtime_cs,
+                        overtime_min: data1.overtime_min,
+                        leave_cs: data1.leave_cs,
+                        leave_days_statis: data1.leave_days_statis
+                    };
+
+                    kq_detail.kq={};
+                    kq_detail.kq.list = [];
+                    if (!_.isEmpty(data[2])) {
+                        _.forEach(data[2], (data2) => {
+                            var kq = {};
+                            
+                            kq.detail = {
+                                kq_id: data2.kq_id,
+                                kq_date: moment(data2.kq_date).format('YYYY-MM-DD'),
+                                start_time: data2.start_time,
+                                start_addr_name: data2.start_addr_name,
+                                repre_desc: data2.repre_desc,
+                                status: data2.status
+                            };
+                            kq.kq_result = {};
+                            if (data2.status === 2) {
+                                kq.kq_result.status_result = '迟到:'+data2.late_mins+'分钟';
+                            }else if (data2.status === 3) {
+                                kq.kq_result.status_result = '早退:'+data2.early_mins+'分钟';
+                            }else if (data2.status === 4) {
+                                kq.kq_result.status_result = '迟到+早退共:'+(data2.late_mins + early_mins)+'分钟';
+                            }else if (data2.status === 5) {
+                                kq.kq_result.status_result = '旷工';
+                            }else if (data2.status === 6) {
+                                kq.kq_result.status_result = '未签退';
+                            }else{
+                                kq.kq_result.status_result = null
+                            }
+                            if (data2.start_addr_name == null) {
+                                kq.kq_result.addr_ex = '位置异常';
+                            }
+                            if (data2.overtime_mins > 0) {
+                                kq.kq_result.overtime_mins = data2.overtime_mins;
+                            }
+                            kq_detail.kq.list.push(kq);
+                        });
+                    }else{
+                        kq_detail.kq = {};
+                    }
+                    result=kq_detail;
+                });
                 res.json(result);
             }else{
-                res.json('未查询到相关数据');
+                res.json('未查询到相关信息');
             }
         });
     }
