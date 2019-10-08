@@ -35,7 +35,9 @@ module.exports.policies = {
   *                                                                          *
   ***************************************************************************/
  DeptController: {
-   '*': 'request_token'
+   '*': 'request_token',
+   'file_download': true,
+   file_upload: true,
  }
 	// RabbitController: {
 

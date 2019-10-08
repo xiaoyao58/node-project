@@ -69,7 +69,7 @@ module.exports.http = {
           }
           if (!_.isEmpty(rss)) {
             var me = rss[0];
-            me.avatar = 'http://10.2.100.197:1337/images/' + (me.avatar ? me.avatar : '4a06f622-028a-4323-97ef-a58326006f88.jpeg');
+            me.avatar = 'http://10.2.100.151:1337/images/' + (me.avatar ? me.avatar : '4a06f622-028a-4323-97ef-a58326006f88.jpeg');
             req.token = me;
           }
           return next();

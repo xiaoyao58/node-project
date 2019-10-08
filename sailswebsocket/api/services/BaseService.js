@@ -38,12 +38,11 @@ var mysql = require('mysql');
 // });
 
 var pool = mysql.createPool({
-	host:'10.2.100.138',
+	host:'10.2.100.151',
 	user:'root',
 	password:'123456',
 	database:'wapp',
 	multipleStatements:true
-	
 });
 var connection = mysql.createConnection({
 	host: '10.1.92.232',

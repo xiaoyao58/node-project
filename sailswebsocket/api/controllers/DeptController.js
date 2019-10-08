@@ -1,5 +1,5 @@
 var moment = require('moment');
-
+var fs = require('fs');
 var request = require('request');
 var uuid = require('uuid');
 module.exports = {
@@ -169,7 +169,7 @@ module.exports = {
                         year_leave.user.job_number = data0.job_number;
                         year_leave.user.user_id = data0.user_id;
                         year_leave.user.name = data0.name;
-                        year_leave.user.avatar = 'http://10.2.100.197:1337/images/' + (data0.avatar ? data0.avatar : '4a06f622-028a-4323-97ef-a58326006f88.jpeg');
+                        year_leave.user.avatar = 'http://10.2.100.151:1337/images/' + (data0.avatar ? data0.avatar : '4a06f622-028a-4323-97ef-a58326006f88.jpeg');
                         year_leave.user.email = data0.email;
                         year_leave.leave.annual = data0.annual;
                         year_leave.leave.use_days = data0.limited_days;
@@ -261,6 +261,45 @@ module.exports = {
             if (err) {
                 return sials.log(err);
             }
-        })
-    }
+        });
+    },
+    file_download: function(req,res){
+        var filePath = 'assets/images/6b3058f8-2b68-4d1c-9123-26dca65979d9.jpg';
+        var stream = fs.createReadStream(filePath);
+        var stats = fs.statSync(filePath);
+        if(stats.isFile()){
+            res.set({
+                'Content-Type':'image/jpg',
+                'Content-Disposition':'attachment;filename=new.jpg',
+                'Content-Length':stats.size
+            });
+            stream.pipe(res);
+        }else{
+            res.end(404);
+        }
+    },
+    file_upload: function (req, res) {
+		//定义文件上传的最大字节
+		const MAXBYTES = 1024 * 1024 * 100;
+		//定义文件上传的位置
+		const FILE_PATH = '../../assets/images';
+		//定义保存上传文件的名称
+		var fileName = uuid.v4();
+
+		//获取文件
+		var file = req.file('file').on('error', function (err) {
+			console.log(err);
+			return sails.log('文件上传超时');
+		});
+        FileUploadService.file_upload(MAXBYTES,FILE_PATH,fileName,file,(err,data)=>{
+            if(err){
+               return sails.log(err);
+            }
+            res.json({
+                errcode: data.errcode,
+                errdesc: data.errdesc,
+                uploadedFiles: data.uploadedFiles
+            })
+        });
+	}
 }
