@@ -2,7 +2,9 @@ var moment = require('moment');
 var fs = require('fs');
 var request = require('request');
 var uuid = require('uuid');
+var xlsx = require('node-xlsx');
 module.exports = {
+    //获取部门
     get_dept: function (req, res) {
         var user_id = req.token.user_id;
         var avatar = req.token.avatar;
@@ -52,6 +54,7 @@ module.exports = {
             }
         })
     },
+    //部门流程查询
     dept_flow: function (req, res) {
         var user_id = req.token.user_id;
         var avatar = req.token.avatar;
@@ -139,6 +142,7 @@ module.exports = {
 
         });
     },
+    //部门年假查询
     year_leave: function (req, res) {
         var admin = req.token.user_id;
         // var dept_id = req.param('dpet_id');
@@ -190,6 +194,7 @@ module.exports = {
         })
 
     },
+    //班次查询
     bc_select: function (req, res) {
         var update_at = moment('2018-01-01').format('YYYY-MM-DD HH:mm:ss');
         var create_at = moment('2018-01-01').format('YYYY-MM-DD HH:mm:ss');
@@ -220,16 +225,21 @@ module.exports = {
             }
         })
     },
+    //创建部门排班
     create_dept_pb: function (req, res) {
         var user_id = req.token.user_id;
+        var dept_id = req.param('dept_id');
+        var scope_get = req.param('scope');
+        var name = req.param('name');
+        var scope = scope_get?scope_get:1;
 
-        var pb_id = uuid.v4();
+        var pb_id = uuid.v4().substring(21);
 
         var project_id = req.param('project_id');
         project_id = project_id ? project_id : 'D5AB602D-745E-4A08-9D90-E0F45DD33FC5';
 
         var type = req.param('type');
-        type = type ? type : 1;
+        type = type ? parseInt(type) : parseInt(1);
 
         var mon_bc = req.param('mon_bc');
         var tue_bc = req.param('tue_bc');
@@ -239,7 +249,7 @@ module.exports = {
         var sat_bc = req.param('sat_bc');
         var sun_bc = req.param('sum_bc');
 
-        var mon = mom_bc ? mon_bc : '5e4cc4ea74844191a8bec4a29ffd25b0';
+        var mon = mon_bc ? mon_bc : '5e4cc4ea74844191a8bec4a29ffd25b0';
         var tue = tue_bc ? tue_bc : '5e4cc4ea74844191a8bec4a29ffd25b0';
         var wed = wed_bc ? wed_bc : '5e4cc4ea74844191a8bec4a29ffd25b0';
         var thu = thu_bc ? thu_bc : '5e4cc4ea74844191a8bec4a29ffd25b0';
@@ -248,7 +258,7 @@ module.exports = {
         var sun = sun_bc ? sun_bc : 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx';
 
         var create_at = moment().format('YYYY-MM-DD HH:mm:ss');
-        var update_at = null;
+        var update_at = moment().format('YYYY-MM-DD HH:mm:ss');
 
         var is_sys = req.param('is_sys');
         is_sys = is_sys ? is_sys : 0;
@@ -257,19 +267,135 @@ module.exports = {
    
         bc_id = bc_id ? bc_id : null;
 
-        BaseService.exec_sql('inset into kq_pb(pb_id,project_id,`type`,`name`,mon,tue,wed,thu,fri,sat,sun,create_at,update_at,is_sys,bc_id) values(?,?,?.?,?,?,?,?,?,?,?,?,?,?,?)', [pb_id, project_id, type, name, mon, tue, wed, thu, fri, sat, sun, create_at, update_at, is_sys, bc_id], (err) => {
+        BaseService.exec_sql('insert into kq_pb(pb_id,project_id,`type`,`name`,mon,tue,wed,thu,fri,sat,sun,create_at,update_at,is_sys,bc_id) values(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)', [pb_id, project_id, type, name, mon, tue, wed, thu, fri, sat, sun, create_at, update_at, is_sys, bc_id], (err) => {
             if (err) {
-                return sials.log(err);
+                return sails.log(err);
+            }
+        });
+        BaseService.exec_sql('insert into kq_pb_dept(pb_id,dept_id,scope,create_at) values(?,?,?,?)',[pb_id,dept_id,scope,create_at],(err)=>{
+            if(err){
+                return sails.log(err);
             }
         });
     },
+    //年休假查询
+    dept_leave_select: function(req,res){
+        var get_annual = req.param('annual');
+        var user_id = req.param('user_id');
+
+        var annual = get_annual?get_annual:moment().get('year');
+        var admin = req.token.user_id;
+        var user_list = [];
+
+
+
+        var result = {};
+        result.list = [];
+        BaseService.exec_sql('select user_id from wdzt.dept_user where dept_id = (select dept_id from wdzt.dept_user where user_id = ?)', [admin], (err, data) => {
+            if (err) {
+                return sails.log(err);
+            }
+            if(data&&!_.isEmpty(data)){
+                _.forEach(data,(data)=>{
+                    var user_id = data.user_id;
+                    if(user_id !== ''){
+                        user_list.push(user_id);
+                    }
+                });
+                if(!_.isEmpty(user_id)){
+                    user_list = _.filter(user_list,(f)=>{
+                        return f.user_id === user_id;
+                    });
+                }
+            }
+            BaseService.exec_sql('select u.user_id,u.`name`,u.job_number,ual.annual,ual.valid_to,ual.limited_days,ual.remaining_days from user_annual_leave ual inner join wdzt.users u on ual.user_id = u.user_id where ual.user_id in (?) and ual.annual = ?',[user_list,annual],(err,data)=>{
+                if(err){
+                    return sails.log(err);
+                }
+                if(data&&!_.isEmpty(data)){
+                    _.forEach(data,(data)=>{
+                        var user_info = {
+                            user_id: data.user_id,
+                            name: data.name,
+                            job_number: data.job_number,
+                            annual: data.annual,
+                            valid_to: moment(data.valid_to).format('YYYY-MM-DD: HH:mm:ss'),
+                            limited_days: data.limited_days,
+                            remaining_days: data.remaining_days
+                        };
+                        result.list.push(user_info);
+                    });
+                    res.json(result);
+                }
+            });
+           
+        });
+    },
+
+    //年假新增
+    dept_leave_set: function(req,res){
+        var get_annual = req.param('annual');
+        var user_id = req.param('user_id');
+        var annual = get_annual?get_annual:moment().get('year');
+        var get_limited_days = req.param('limited_days');
+        var limited_days = get_limited_days?parseInt(get_limited_days):15;
+        var remaining_days = limited_days;
+        var valid_to = req.param('valid_to');
+
+        var create_at = moment().format('YYYY-MM-DD HH:mm:ss');
+        var update_at = moment().format('YYYY-MM-DD HH:mm:ss');
+    
+        BaseService.exec_sql('call sp_dept_set(?,?,?,?,?,?,?)',[user_id,annual,valid_to,limited_days,remaining_days,create_at,update_at],(err,data)=>{
+            if(err){
+                return sails.log(err);
+            }
+        });
+    },
+    //年假导入
+    dept_leave_upload: function(req,res){
+        var file_name = '';
+        var upload_file = '';
+        //定义文件上传的最大字节
+		const MAXBYTES = 1024 * 1024 * 100;
+		//定义文件上传的位置
+		const FILE_PATH = '../../file/excel';
+		//定义保存上传文件的名称
+		var fileName = uuid.v4();
+
+		//获取文件
+		var file = req.file('file').on('error', function (err) {
+			console.log(err);
+			return sails.log('文件上传超时');
+		});
+        FileUploadService.file_upload(MAXBYTES,FILE_PATH,fileName,file,(err,data)=>{
+            if(err){
+               return sails.log(err);
+            }
+            _.forEach(data.uploadedFiles,(uploadFile)=>{
+                upload_file = JSON.stringify(uploadFile.fd);
+            })
+            file_name = upload_file.substring(upload_file.lastIndexOf("\\")+1);
+            var sheets = xlsx.parse('../../file/excel/'+file_name);
+            sheets.forEach((sheet)=>{
+                console.log(sheet['name']);
+                for(var rowId in sheet['data']){
+                    console.log(rowId);
+                    var row = sheet['data'][rowId];
+                    console.log(row);
+                }
+            })
+        });
+    },
+    //文件下载
     file_download: function(req,res){
         var filePath = 'assets/images/6b3058f8-2b68-4d1c-9123-26dca65979d9.jpg';
         var stream = fs.createReadStream(filePath);
         var stats = fs.statSync(filePath);
+        var ua = req.headers['user-agent'];
+        console.log(ua);
         if(stats.isFile()){
             res.set({
-                'Content-Type':'image/jpg',
+                'Content-Type':'image/jpeg',
                 'Content-Disposition':'attachment;filename=new.jpg',
                 'Content-Length':stats.size
             });
@@ -278,6 +404,7 @@ module.exports = {
             res.end(404);
         }
     },
+    //文件上传
     file_upload: function (req, res) {
 		//定义文件上传的最大字节
 		const MAXBYTES = 1024 * 1024 * 100;
@@ -299,7 +426,7 @@ module.exports = {
                 errcode: data.errcode,
                 errdesc: data.errdesc,
                 uploadedFiles: data.uploadedFiles
-            })
+            });
         });
 	}
 }

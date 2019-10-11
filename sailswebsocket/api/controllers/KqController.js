@@ -60,11 +60,7 @@ module.exports = {
     kq_details: function (req, res) {
         var user_id = req.param('user_id');
         var kq_date = req.param('kq_date');
-
         var result = {};
-
-
-
         BaseService.exec_sql('call sp_kq_detail(?,?)', [user_id, kq_date], (err, data) => {
             console.log(data[2]);
             if (err) {
