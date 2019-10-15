@@ -62,7 +62,7 @@ module.exports.http = {
     myTokenParse: function (req, res, next) {
       var access_token = req.param('access_token');
       if (access_token) {
-        BaseService.exec_sql('select u.user_id,u.`name`,u.avatar from wdzt.users u,wdzt.app_token `at` where u.user_id = at.create_user and at.access_token = ?',[access_token], function (err, rss) {
+        BaseService.exec_sql('select * from wdzt.users u,wdzt.app_token `at` where u.user_id = at.create_user and at.access_token = ?',[access_token], function (err, rss) {
           if (err) {
             sails.log(err);
             return next();

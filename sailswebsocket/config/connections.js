@@ -49,7 +49,7 @@ module.exports.connections = {
   // },
    mysql: {
      adapter: 'sails-mysql',
-     host: '10.2.100.139',
+     host: '10.2.100.188',
      user: 'root',
      password: '123456',
      database: 'wapp'

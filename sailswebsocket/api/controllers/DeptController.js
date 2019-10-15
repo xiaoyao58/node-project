@@ -235,11 +235,11 @@ module.exports = {
 
         var pb_id = uuid.v4().substring(21);
 
-        var project_id = req.param('project_id');
+        var project_id = req.token.project_id;
         project_id = project_id ? project_id : 'D5AB602D-745E-4A08-9D90-E0F45DD33FC5';
 
         var type = req.param('type');
-        type = type ? parseInt(type) : parseInt(1);
+        type = type ? parseInt(type) : parseInt(2);
 
         var mon_bc = req.param('mon_bc');
         var tue_bc = req.param('tue_bc');
@@ -286,9 +286,6 @@ module.exports = {
         var annual = get_annual ? get_annual : moment().get('year');
         var admin = req.token.user_id;
         var user_list = [];
-
-
-
         var result = {};
         result.list = [];
         BaseService.exec_sql('select user_id from wdzt.dept_user where dept_id = (select dept_id from wdzt.dept_user where user_id = ?)', [admin], (err, data) => {
@@ -380,10 +377,10 @@ module.exports = {
         var file_buffer = file._files[0].stream._readableState.buffer[0];
 
         var sheets = xlsx.parse(file_buffer);
-        
+
         _.forEach(sheets, (sheet) => {
             console.log('sheet_name:' + sheet.name);
-            var done = _.after(sheet.data.length-1,()=>{
+            var done = _.after(sheet.data.length - 1, () => {
                 res.json(result);
             })
             for (var rowId in sheet['data']) {
@@ -400,7 +397,6 @@ module.exports = {
                     remaining_days_list.push(parseInt(row[6]));
                     create_at_list.push(moment().format('YYYY-MM-DD HH:mm:ss'));
                     update_at_list.push(moment().format('YYYY-MM-MM HH:mm:ss'));
-
                     BaseService.exec_sql('select user_id from wdzt.users where `name`=?', [user_name], (err, data) => {
                         var annual = annual_list.shift();
                         var valid_to = valid_to_list.shift();
@@ -419,34 +415,31 @@ module.exports = {
                                 if (err) {
                                     return sails.log(err);
                                 }
-                                if(data&&!_.isEmpty(data)){
+                                if (data && !_.isEmpty(data)) {
                                     result.list.push(data);
                                 }
                                 done();
                             });
                         }
                     });
-
                 }
-
             }
         });
     },
-
     create_user_pb: function (req, res) {
         var user_id = req.param('user_id');
         var user_id_list = user_id.split(',');
         var pb_sql = '';
         var pb_list = [];
-        
+
         var name = req.param('name');
         var pb_id = uuid.v4().substring(21);
 
-        var project_id = req.param('project_id');
+        var project_id = req.token.project_id;
         project_id = project_id ? project_id : 'D5AB602D-745E-4A08-9D90-E0F45DD33FC5';
 
         var type = req.param('type');
-        type = type ? parseInt(type) : parseInt(1);
+        type = type ? parseInt(type) : parseInt(2);
 
         var mon_bc = req.param('mon_bc');
         var tue_bc = req.param('tue_bc');
@@ -456,11 +449,11 @@ module.exports = {
         var sat_bc = req.param('sat_bc');
         var sun_bc = req.param('sum_bc');
 
-        var mon = mon_bc ? mon_bc : '5e4cc4ea74844191a8bec4a29ffd25b0';
-        var tue = tue_bc ? tue_bc : '5e4cc4ea74844191a8bec4a29ffd25b0';
-        var wed = wed_bc ? wed_bc : '5e4cc4ea74844191a8bec4a29ffd25b0';
-        var thu = thu_bc ? thu_bc : '5e4cc4ea74844191a8bec4a29ffd25b0';
-        var fri = fri_bc ? fri_bc : '5e4cc4ea74844191a8bec4a29ffd25b0';
+        var mon = mon_bc ? mon_bc : '787127caae5e43afa0f5670fc8d99df8';
+        var tue = tue_bc ? tue_bc : '787127caae5e43afa0f5670fc8d99df8';
+        var wed = wed_bc ? wed_bc : '787127caae5e43afa0f5670fc8d99df8';
+        var thu = thu_bc ? thu_bc : '787127caae5e43afa0f5670fc8d99df8';
+        var fri = fri_bc ? fri_bc : '787127caae5e43afa0f5670fc8d99df8';
         var sat = sat_bc ? sat_bc : 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx';
         var sun = sun_bc ? sun_bc : 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx';
 
@@ -474,36 +467,36 @@ module.exports = {
 
         bc_id = bc_id ? bc_id : null;
 
-    
-        for(var i = 0 ;i<user_id_list.length;i++){
+
+        for (var i = 0; i < user_id_list.length; i++) {
             var sql = 'insert into kq_pb_user(pb_id,user_id,create_at) values(?,?,?);'
-            pb_sql +=sql;
-            pb_list.push(pb_id,user_id_list[i],create_at);
-            
+            pb_sql += sql;
+            pb_list.push(pb_id, user_id_list[i], create_at);
+
         }
         BaseService.exec_sql('insert into kq_pb(pb_id,project_id,`type`,`name`,mon,tue,wed,thu,fri,sat,sun,create_at,update_at,is_sys,bc_id) values(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)', [pb_id, project_id, type, name, mon, tue, wed, thu, fri, sat, sun, create_at, update_at, is_sys, bc_id], (err) => {
             if (err) {
                 return sails.log(err);
             }
         });
-        BaseService.exec_sql(pb_sql, pb_list, (err,data) => {
+        BaseService.exec_sql(pb_sql, pb_list, (err, data) => {
             if (err) {
                 return sails.log(err);
-            }else{
+            } else {
                 res.json(data);
             }
         });
     },
-    get_bc: function(req,res){
+    get_bc: function (req, res) {
         var bc_id = req.param('bc_id');
-        var bc= {};
-        bc_id = bc_id?bc_id:'787127caae5e43afa0f5670fc8d99df8';
-        BaseService.exec_sql('select * from kq_bc where bc_id = ?',[bc_id],(err,data)=>{
-            if(err){
+        var bc = {};
+        bc_id = bc_id ? bc_id : '787127caae5e43afa0f5670fc8d99df8';
+        BaseService.exec_sql('select * from kq_bc where bc_id = ?', [bc_id], (err, data) => {
+            if (err) {
                 return sails.log(err);
             }
-            if(!_.isEmpty(data)){
-                _.forEach(data,(data)=>{
+            if (!_.isEmpty(data)) {
+                _.forEach(data, (data) => {
                     bc.bc_id = data.bc_id;
                     bc.project_id = data.project_id;
                     bc.name = data.name;
@@ -516,58 +509,56 @@ module.exports = {
                     bc.ahead_time = data.ahead_time;
                 });
                 return res.json(bc);
-            }else{
+            } else {
                 res.json('无该班次信息');
             }
         })
     },
     //日历调班查询
-    calendar_tb_select: function(req,res){
+    calendar_tb_select: function (req, res) {
         var admin = req.token.user_id;
         var get_start = req.param('start');
         var get_end = req.param('end');
-        var start = get_start?moment(get_start).format('YYYY-MM-DD'):moment().startOf('week').add(1,'day').format('YYYY-MM-DD');
-        var end = get_end?moment(get_end).format('YYYY-MM-DD'): moment().endOf('week').add(1,'day').format('YYYY-MM-DD');
+        var start = get_start ? moment(get_start).format('YYYY-MM-DD') : moment().startOf('week').add(1, 'day').format('YYYY-MM-DD');
+        var end = get_end ? moment(get_end).format('YYYY-MM-DD') : moment().endOf('week').add(1, 'day').format('YYYY-MM-DD');
         var user_id = req.param('user_id');
-        if(!_.isEmpty(user_id))
-        var today = moment().format('YYYY-MM-DD');
+        if (!_.isEmpty(user_id))
+            var today = moment().format('YYYY-MM-DD');
         var tb = {};
         tb.list = [];
-
-       
-        BaseService.exec_sql('select du.dept_id,d.simple_name from wdzt.dept_user du,wdzt.dept d where du.dept_id = d.dept_id and du.user_id = ?',[admin],(err,data)=>{
-            if(err){
+        BaseService.exec_sql('select du.dept_id,d.simple_name from wdzt.dept_user du,wdzt.dept d where du.dept_id = d.dept_id and du.user_id = ?', [admin], (err, data) => {
+            if (err) {
                 return sails.log(err);
             }
-            if(!_.isEmpty(data)){
-                _.forEach(data,(data)=>{
+            if (!_.isEmpty(data)) {
+                _.forEach(data, (data) => {
                     var dept_id = data.dept_id;
                     var dept_name = data.simple_name;
-                    BaseService.exec_sql('select user_id from wdzt.dept_user where dept_id = ?',[dept_id],(err,data)=>{
-                        if(err){
+                    BaseService.exec_sql('select user_id from wdzt.dept_user where dept_id = ?', [dept_id], (err, data) => {
+                        if (err) {
                             return sails.log(err);
                         }
-                        if(!_.isEmpty(data)){
-                            var done = _.after(data.length,()=>{
-                                if(!_.isEmpty(user_id)){
-                                    tb.list = _.filter(tb.list,(t)=>{
+                        if (!_.isEmpty(data)) {
+                            var done = _.after(data.length, () => {
+                                if (!_.isEmpty(user_id)) {
+                                    tb.list = _.filter(tb.list, (t) => {
                                         return user_id.indexOf(t.user_id) !== -1;
                                     });
                                 }
                                 return res.json(tb);
                             })
-                            _.forEach(data,(user)=>{
-                                BaseService.exec_sql('select * from kq_pb_user where user_id = ?;select * from kq_pb_date where user_id = ? and rule_date>=? and rule_date<=?',[user.user_id,user.user_id,start,end],(err,data_user)=>{
-                                    if(err){
+                            _.forEach(data, (user) => {
+                                BaseService.exec_sql('select * from kq_pb_user where user_id = ?;select * from kq_pb_date where user_id = ? and rule_date>=? and rule_date<=?', [user.user_id, user.user_id, start, end], (err, data_user) => {
+                                    if (err) {
                                         return sails.log(err);
                                     }
-                                    if(!_.isEmpty(data_user[0])){
-                                        BaseService.exec_sql('select u.`name`,u.user_id,kp.mon,kp.tue,kp.wed,kp.thu,kp.fri,kp.sat,kp.sun from kq_pb kp inner join kq_pb_user kpu on kp.pb_id = kpu.pb_id inner join wdzt.users u on u.user_id = kpu.user_id where kpu.user_id = ?',[user.user_id],(err,data)=>{
-                                            if(err){
+                                    if (!_.isEmpty(data_user[0])) {
+                                        BaseService.exec_sql('select u.`name`,u.user_id,kp.mon,kp.tue,kp.wed,kp.thu,kp.fri,kp.sat,kp.sun from kq_pb kp inner join kq_pb_user kpu on kp.pb_id = kpu.pb_id inner join wdzt.users u on u.user_id = kpu.user_id where kpu.user_id = ?', [user.user_id], (err, data) => {
+                                            if (err) {
                                                 return sails.log(err);
                                             }
-                                            if(!_.isEmpty(data)){
-                                                _.forEach(data,(data)=>{
+                                            if (!_.isEmpty(data)) {
+                                                _.forEach(data, (data) => {
                                                     var t = {};
                                                     t.name = data.name;
                                                     t.user_id = data.user_id;
@@ -578,29 +569,28 @@ module.exports = {
                                                     t.fri = data.fri;
                                                     t.sat = data.sat;
                                                     t.sun = data.sun;
-                                                    if(!_.isEmpty(data_user[1])){
-                                                        
-                                                        _.forEach(data_user[1],(u)=>{
+                                                    if (!_.isEmpty(data_user[1])) {
+                                                        _.forEach(data_user[1], (u) => {
                                                             var week = moment(u.rule_date).day();
-                                                            if(week === 1){
+                                                            if (week === 1) {
                                                                 t.mon = u.bc_id;
                                                             }
-                                                            if(week === 2){
+                                                            if (week === 2) {
                                                                 t.tue = u.bc_id;
                                                             }
-                                                            if(week === 3){
+                                                            if (week === 3) {
                                                                 t.wed = u.bc_id;
                                                             }
-                                                            if(week === 4){
+                                                            if (week === 4) {
                                                                 t.thu = u.bc_id;
                                                             }
-                                                            if(week === 5){
+                                                            if (week === 5) {
                                                                 t.fri = u.bc_id;
                                                             }
-                                                            if(week === 6){
+                                                            if (week === 6) {
                                                                 t.sat = u.bc_id;
                                                             }
-                                                            if(week === 0){
+                                                            if (week === 0) {
                                                                 t.sun = u.bc_id;
                                                             }
                                                         });
@@ -610,13 +600,13 @@ module.exports = {
                                                 done();
                                             }
                                         })
-                                    }else{
-                                        BaseService.exec_sql('select * from kq_pb kp,kq_pb_dept kpd where kp.pb_id = kpd.pb_id and dept_id = ?',[dept_id],(err,data)=>{
-                                            if(err){
+                                    } else {
+                                        BaseService.exec_sql('select * from kq_pb kp,kq_pb_dept kpd where kp.pb_id = kpd.pb_id and dept_id = ?', [dept_id], (err, data) => {
+                                            if (err) {
                                                 return sails.log(err);
                                             }
-                                            if(!_.isEmpty(data)){
-                                                _.forEach(data,(data)=>{
+                                            if (!_.isEmpty(data)) {
+                                                _.forEach(data, (data) => {
                                                     var t = {};
                                                     t.name = data.name;
                                                     t.user_id = data.user_id;
@@ -642,24 +632,25 @@ module.exports = {
         });
     },
     //日历调班设置
-    calendar_tb_set: function(req,res){
+    calendar_tb_set: function (req, res) {
         var user_id = req.param('user_id');
         var date = req.param('date');
         var bc_id = req.param('bc_id');
         var create_at = moment().format('YYYY-MM-DD HH:mm:ss');
         var update_at = moment().format('YYYY-MM-DD HH:mm:ss');
-        var project_id = req.param('project_id');
-        project_id = project_id?project_id:'D5AB602D-745E-4A08-9D90-E0F45DD33FC5';
-
-        if(moment(date).format('YYYY-MM-DD')>moment().format('YYYY-MM-DD')){
-            BaseService.exec_sql('call sp_calendar_pb_set(?,?,?,?,?,?)',[user_id,date,bc_id,create_at,update_at,project_id],(err,data)=>{
-                if(err){
+        var project_id = req.token.project_id;
+        project_id = project_id ? project_id : 'D5AB602D-745E-4A08-9D90-E0F45DD33FC5';
+        if (moment(date).format('YYYY-MM-DD') > moment().format('YYYY-MM-DD')) {
+            BaseService.exec_sql('call sp_calendar_pb_set(?,?,?,?,?,?)', [user_id, date, bc_id, create_at, update_at, project_id], (err, data) => {
+                if (err) {
                     return sails.log(err);
                 }
-                if(!_.isEmpty(data)){
+                if (!_.isEmpty(data)) {
                     return res.json(data);
                 }
             })
+        }else{
+            res.json('无相关数据');
         }
     },
     //文件下载
