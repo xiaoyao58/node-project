@@ -229,14 +229,14 @@ module.exports = {
         var status = 1;
         var province = req.param('province');
         var city = req.param('city');
-        var dept_id = (req.param('dept_id'))?(req.param('dept_id')):null;
+        var dept_id = (req.param('dept_id')) ? (req.param('dept_id')) : null;
         var create_user = req.token.user_id;
-        var type = (req.param('type'))?(parseInt(req.param('type'))):1;
-        BaseService.exec_sql('insert into kq_addr(addr_id,name,addr_desc,lng,lat,radius,create_at,update_at,project_id,status,province,city,dept_id,create_user,type) values(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)',[addr_id,name,addr_desc,lng,lat,radius,create_at,update_at,project_id,status,province,city,dept_id,create_user,type],(err,data)=>{
-            if(err){
+        var type = (req.param('type')) ? (parseInt(req.param('type'))) : 1;
+        BaseService.exec_sql('insert into kq_addr(addr_id,name,addr_desc,lng,lat,radius,create_at,update_at,project_id,status,province,city,dept_id,create_user,type) values(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)', [addr_id, name, addr_desc, lng, lat, radius, create_at, update_at, project_id, status, province, city, dept_id, create_user, type], (err, data) => {
+            if (err) {
                 return sails.log(err);
             }
-            if(data){
+            if (data) {
                 return res.json('insert success!');
             }
         })

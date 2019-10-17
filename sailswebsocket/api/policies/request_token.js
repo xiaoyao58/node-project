@@ -26,7 +26,7 @@ module.exports = function(req, res, next) {
     //   }
 
       if(req.token.client_info){
-          if(!(req.token.client_info==req.headers['user-agent'])){
+          if((req.token.client_info==req.headers['user-agent'])){
               return res.json({error_code: '10201', error_desc: '获取access_token时发生错误，或者access_token无效'});
           }
       }

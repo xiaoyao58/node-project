@@ -426,6 +426,7 @@ module.exports = {
             }
         });
     },
+    //个人排班
     create_user_pb: function (req, res) {
         var user_id = req.param('user_id');
         var user_id_list = user_id.split(',');
@@ -487,6 +488,7 @@ module.exports = {
             }
         });
     },
+    //获取班次
     get_bc: function (req, res) {
         var bc_id = req.param('bc_id');
         var bc = {};
@@ -641,7 +643,7 @@ module.exports = {
         var project_id = req.token.project_id;
         project_id = project_id ? project_id : 'D5AB602D-745E-4A08-9D90-E0F45DD33FC5';
         if (moment(date).format('YYYY-MM-DD') > moment().format('YYYY-MM-DD')) {
-            BaseService.exec_sql('call sp_calendar_pb_set(?,?,?,?,?,?)', [user_id, date, bc_id, create_at, update_at, project_id], (err, data) => {
+            BaseService.exec_sql('insert into kq_pb_date(user_id,rule_date,bc_id,create_at,update_at,project_id) values(?,?,?,?,?,?) on duplicate key update bc_id = ?,update_at = ? ', [user_id, date, bc_id, create_at, update_at, project_id,bc_id,update_at], (err, data) => {
                 if (err) {
                     return sails.log(err);
                 }
@@ -650,7 +652,7 @@ module.exports = {
                 }
             })
         }else{
-            res.json('无相关数据');
+            res.json('只能对当前日期之后的日期进行修改');
         }
     },
     //文件下载
