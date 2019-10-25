@@ -8,7 +8,7 @@
  * For more information on configuration, check out:
  * http://sailsjs.org/#!/documentation/reference/sails.config/sails.config.http.html
  */
-
+var moment = require('moment');
 module.exports.http = {
 
   /****************************************************************************
@@ -60,6 +60,10 @@ module.exports.http = {
     //     return next();
     // }
     myTokenParse: function (req, res, next) {
+      // setInterval(()=>{
+      //   console.log(moment().format('YYYY-MM-DD HH:mm:ss'));
+      // },1000);
+      
       var access_token = req.param('access_token');
       if (access_token) {
         BaseService.exec_sql('select * from wdzt.users u,wdzt.app_token `at` where u.user_id = at.create_user and at.access_token = ?',[access_token], function (err, rss) {

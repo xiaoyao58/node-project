@@ -38,6 +38,12 @@ module.exports.policies = {
    '*': 'request_token',
    'file_download': true,
    file_upload: true,
+ },
+
+ SystemController: {
+  '*': 'request_token',
+  sails_test: true,
+  logTest:true
  }
 	// RabbitController: {
 

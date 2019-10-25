@@ -239,6 +239,12 @@ module.exports = {
             if (data) {
                 return res.json('insert success!');
             }
-        })
+        });
+    },
+    logTest: function(req,res){
+        sails.log("debug");
+        sails.log.error('error',moment().format('YYYY-MM-DD HH:mm:ss'),moment().format('dddd'));
+        sails.log.info('info');
+        
     }
 }
