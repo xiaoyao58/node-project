@@ -287,6 +287,7 @@ module.exports = {
             }
         });
     },
+    //实时聊天发送
     send_msg: function(req,res){
         var conv_id = req.param('conv_id');
         var user = req.token.user_id;
