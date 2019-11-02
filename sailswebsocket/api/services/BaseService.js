@@ -37,12 +37,20 @@ var mysql = require('mysql');
 //  	multipleStatements: true
 // });
 
+// var pool = mysql.createPool({
+// 	host:'10.2.100.122',
+// 	user:'root',
+// 	password:'123456',
+// 	database:'wapp',
+// 	multipleStatements:true
+// });
+
 var pool = mysql.createPool({
-	host:'10.2.100.108',
-	user:'root',
-	password:'123456',
-	database:'wapp',
-	multipleStatements:true
+	host: '10.1.92.232',
+	user: 'wdzt',
+	password: 'Wdzt!@2016',
+	database: 'wapp',
+	multipleStatements: true
 });
 var connection = mysql.createConnection({
 	host: '10.1.92.232',

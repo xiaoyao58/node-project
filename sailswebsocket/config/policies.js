@@ -44,6 +44,9 @@ module.exports.policies = {
   '*': 'request_token',
   sails_test: true,
   logTest:true
+ },
+ DocController: {
+   '*': 'request_token'
  }
 	// RabbitController: {
 

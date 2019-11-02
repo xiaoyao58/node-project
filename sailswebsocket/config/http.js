@@ -63,10 +63,10 @@ module.exports.http = {
       // setInterval(()=>{
       //   console.log(moment().format('YYYY-MM-DD HH:mm:ss'));
       // },1000);
-      
+
       var access_token = req.param('access_token');
       if (access_token) {
-        BaseService.exec_sql('select * from wdzt.users u,wdzt.app_token `at` where u.user_id = at.create_user and at.access_token = ?',[access_token], function (err, rss) {
+        BaseService.exec_sql('select * from wdzt.users u,wdzt.app_token `at` where u.user_id = at.create_user and at.access_token = ?', [access_token], function (err, rss) {
           if (err) {
             sails.log(err);
             return next();
@@ -74,11 +74,28 @@ module.exports.http = {
           if (!_.isEmpty(rss)) {
             var me = rss[0];
             me.avatar = 'http://10.2.100.151:1337/images/' + (me.avatar ? me.avatar : '4a06f622-028a-4323-97ef-a58326006f88.jpeg');
-            req.token = me;
+            BaseService.exec_sql('select dept_id from wdzt.dept_user where user_id = ?', [rss[0].user_id], (err, dept) => {
+              if (err) {
+                req.token = me;
+                sails.log.error(err);
+                return next();
+              }
+              if (!_.isEmpty(dept)) {
+                me.dept_id = []
+                _.forEach(dept,(d)=>{
+                  var dept_id = {};
+                  dept_id.dept_id = d.dept_id;
+                  me.dept_id.push(dept_id);
+                })
+                req.token = me;
+                return next();
+              }
+            });
+          } else {
+            return next();
           }
-          return next();
         })
-      }else{
+      } else {
         return next();
       }
     }

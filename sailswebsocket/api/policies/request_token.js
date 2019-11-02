@@ -32,7 +32,6 @@ module.exports = function(req, res, next) {
       }
     return next();
   }
-
   // User is not allowed
   // (default res.forbidden() behavior can be overridden in `config/403.js`)
   return res.json({error_code: '10201', error_desc: '获取access_token时发生错误，或者access_token无效'});
