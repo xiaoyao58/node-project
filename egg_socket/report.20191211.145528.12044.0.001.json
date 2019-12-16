@@ -1,0 +1,140 @@
+
+{
+  "header": {
+    "reportVersion": 1,
+    "event": "Allocation failed - JavaScript heap out of memory",
+    "trigger": "FatalError",
+    "filename": "report.20191211.145528.12044.0.001.json",
+    "dumpEventTime": "2019-12-11T14:55:28Z",
+    "dumpEventTimeStamp": "1576047328878",
+    "processId": 12044,
+    "cwd": "D:\\nodeproject\\node-project\\egg_socket",
+    "commandLine": [
+      "D:\\nodejs\\node.exe",
+      "--require",
+      "D:\\nodeproject\\node-project\\egg_socket\\node_modules\\egg-bin\\node_modules\\egg-ts-helper\\register.js",
+      "D:\\nodeproject\\node-project\\egg_socket\\node_modules\\egg-cluster\\lib\\app_worker.js",
+      "{\"framework\":\"D:\\\\nodeproject\\\\node-project\\\\egg_socket\\\\node_modules\\\\egg\",\"baseDir\":\"D:\\\\nodeproject\\\\node-project\\\\egg_socket\",\"workers\":1,\"plugins\":null,\"https\":false,\"typescript\":false,\"declarations\":true,\"clusterPort\":51415}"
+    ],
+    "nodejsVersion": "v12.12.0",
+    "wordSize": 64,
+    "arch": "x64",
+    "platform": "win32",
+    "componentVersions": {
+      "node": "12.12.0",
+      "v8": "7.7.299.13-node.12",
+      "uv": "1.32.0",
+      "zlib": "1.2.11",
+      "brotli": "1.0.7",
+      "ares": "1.15.0",
+      "modules": "72",
+      "nghttp2": "1.39.2",
+      "napi": "5",
+      "llhttp": "1.1.4",
+      "http_parser": "2.8.0",
+      "openssl": "1.1.1d",
+      "cldr": "35.1",
+      "icu": "64.2",
+      "tz": "2019a",
+      "unicode": "12.1"
+    },
+    "release": {
+      "name": "node",
+      "headersUrl": "https://nodejs.org/download/release/v12.12.0/node-v12.12.0-headers.tar.gz",
+      "sourceUrl": "https://nodejs.org/download/release/v12.12.0/node-v12.12.0.tar.gz",
+      "libUrl": "https://nodejs.org/download/release/v12.12.0/win-x64/node.lib"
+    },
+    "osName": "Windows_NT",
+    "osRelease": "10.0.18362",
+    "osVersion": "Windows 10 Home China",
+    "osMachine": "x86_64",
+    "cpus": [
+      {
+        "model": "Intel(R) Core(TM) i5-8265U CPU @ 1.60GHz",
+        "speed": 1800,
+        "user": 15688281,
+        "nice": 0,
+        "sys": 13700015,
+        "idle": 196590109,
+        "irq": 3193031
+      },
+      {
+        "model": "Intel(R) Core(TM) i5-8265U CPU @ 1.60GHz",
+        "speed": 1800,
+        "user": 9915031,
+        "nice": 0,
+        "sys": 4998843,
+        "idle": 211064187,
+        "irq": 314906
+      },
+      {
+        "model": "Intel(R) Core(TM) i5-8265U CPU @ 1.60GHz",
+        "speed": 1800,
+        "user": 21956484,
+        "nice": 0,
+        "sys": 9441718,
+        "idle": 194579875,
+        "irq": 271531
+      },
+      {
+        "model": "Intel(R) Core(TM) i5-8265U CPU @ 1.60GHz",
+        "speed": 1800,
+        "user": 11503593,
+        "nice": 0,
+        "sys": 5572718,
+        "idle": 208901765,
+        "irq": 195906
+      },
+      {
+        "model": "Intel(R) Core(TM) i5-8265U CPU @ 1.60GHz",
+        "speed": 1800,
+        "user": 18063062,
+        "nice": 0,
+        "sys": 9171125,
+        "idle": 198743890,
+        "irq": 280000
+      },
+      {
+        "model": "Intel(R) Core(TM) i5-8265U CPU @ 1.60GHz",
+        "speed": 1800,
+        "user": 8711578,
+        "nice": 0,
+        "sys": 5314421,
+        "idle": 211952078,
+        "irq": 175296
+      },
+      {
+        "model": "Intel(R) Core(TM) i5-8265U CPU @ 1.60GHz",
+        "speed": 1800,
+        "user": 16135062,
+        "nice": 0,
+        "sys": 5858234,
+        "idle": 203984781,
+        "irq": 190312
+      },
+      {
+        "model": "Intel(R) Core(TM) i5-8265U CPU @ 1.60GHz",
+        "speed": 1800,
+        "user": 12435031,
+        "nice": 0,
+        "sys": 5336828,
+        "idle": 208206187,
+        "irq": 137109
+      }
+    ],
+    "networkInterfaces": [
+      {
+        "name": "本地连接* 2",
+        "internal": false,
+        "mac": "1a:56:80:84:c3:35",
+        "address": "fe80::21e6:3827:5345:6d26",
+        "netmask": "ffff:ffff:ffff:ffff::",
+        "family": "IPv6",
+        "scopeid": 5
+      },
+      {
+        "name": "本地连接* 2",
+        "internal": false,
+        "mac": "1a:56:80:84:c3:35",
+        "address": "192.168.137.1",
+        "
