@@ -8,6 +8,7 @@ module.exports = app => {
         var room = req.conv_id;
         // 加入房间
         socket.join(room);
+        ctx.room = room;
         const socket_id = socket.id;
         console.log(socket_id+"已连接");
         await next();

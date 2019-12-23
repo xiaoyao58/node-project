@@ -1,4 +1,5 @@
 'use strict';
+const {promisify} = require('util');
 const Service = require('egg').Service;
 class MysqlService extends Service {
     async exec_sql(sql_text,params,cb) {

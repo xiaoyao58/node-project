@@ -12,4 +12,8 @@ module.exports = app => {
   router.post('/chat',controller.test.chat);
   router.post('/chat/redis',controller.test.redis);
   router.post('/chat/msg',controller.test.get_msg);
+  router.post('/conv/conv/get',controller.conv.conv.get);
+  router.post('/conv/conv/save',controller.conv.conv.save);
+  router.post('/conv/conv/delete',controller.conv.conv.delete);
+  router.post('/conv/member/save',controller.conv.member.save);
 };

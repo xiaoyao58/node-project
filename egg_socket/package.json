@@ -7,12 +7,16 @@
     "declarations": true
   },
   "dependencies": {
+    "acorn": "^7.0.0",
+    "co-mocha": "^1.2.2",
     "egg": "^2.15.1",
     "egg-mysql": "^3.0.0",
     "egg-redis": "^2.4.0",
-    "egg-scripts": "^2.11.0",
+    "egg-scripts": "^2.12.0",
     "egg-socket.io": "^4.1.6",
-    "moment": "^2.24.0"
+    "mocha": "^5.2.0",
+    "moment": "^2.24.0",
+    "node-uuid": "^1.4.8"
   },
   "devDependencies": {
     "autod": "^3.0.1",
